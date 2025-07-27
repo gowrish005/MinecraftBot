@@ -1,0 +1,44 @@
+{
+  "Temperature": {
+    "min": 15.0,
+    "max": 40.0,
+    "default": 28.0,
+    "unit": "\u00b0C",
+    "color": "#EF4444"
+  },
+  "Humidity": {
+    "min": 30.0,
+    "max": 90.0,
+    "default": 65.0,
+    "unit": "%",
+    "color": "#3B82F6"
+  },
+  "Air_Flow_Rate": {
+    "min": 60.0,
+    "max": 180.0,
+    "default": 120.0,
+    "unit": "CFM",
+    "color": "#10B981"
+  },
+  "Fan_Speed": {
+    "min": 1500,
+    "max": 2800,
+    "default": 2200,
+    "unit": "RPM",
+    "color": "#F59E0B"
+  },
+  "Heating_Power": {
+    "min": 8.0,
+    "max": 20.0,
+    "default": 15.0,
+    "unit": "kW",
+    "color": "#8B5CF6"
+  },
+  "Fan_Power": {
+    "min": 150.0,
+    "max": 300.0,
+    "default": 225.0,
+    "unit": "W",
+    "color": "#EC4899"
+  }
+}

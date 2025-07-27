@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Local development
+*.sqlite
+*.db
+local_data/
+
+# Logs
+*.log
+logs/
+
+# If using pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local mongodb data
+mongodb/data/
+mongodb/log/

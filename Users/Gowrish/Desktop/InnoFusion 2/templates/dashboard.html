@@ -1,0 +1,1087 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Tea Processing Monitor{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <section class="hero-section mb-5" data-aos="fade-up">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Tea Processing Monitor</h1>
+                <p class="lead mb-4">Real-time monitoring and control system for tea processing operations.</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('static', filename='Leaf_Logic_AI_Prototype_Report.pdf') }}" class="btn btn-primary" download>
+                        <i class="fas fa-download me-2"></i> Download Report
+                    </a>                    <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#alertSettingsModal">
+                        <i class="fas fa-bell me-2"></i> Set Alerts
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block">
+                <div class="hero-image text-center">
+                    <div class="logo-text-container animate-bounce" style="animation-duration: 3s; animation-timing-function: ease-in-out;">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 100px;">
+                        <div class="hero-circle">Leaf Logic.pro</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Overview Section -->
+    <section class="mb-5" data-aos="fade-up">
+        <div class="section-title">
+            <h2>System Overview</h2>
+        </div>
+        
+        <div class="system-overview">
+            <div class="row">
+                <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="status-count">                        <div class="status-icon mb-3">
+                            <i class="fas fa-play-circle text-success fa-2x"></i>
+                        </div>
+                        <h3 id="running-count">{{ overview.running }}</h3>
+                        <p class="text mb-0">Running</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="status-count">                        <div class="status-icon mb-3">
+                            <i class="fas fa-pause-circle text-warning fa-2x"></i>
+                        </div>
+                        <h3 id="idle-count">{{ overview.idle }}</h3>
+                        <p class="text mb-0">Idle</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="status-count">                        <div class="status-icon mb-3">
+                            <i class="fas fa-tools text-info fa-2x"></i>
+                        </div>
+                        <h3 id="maintenance-count">{{ overview.maintenance }}</h3>
+                        <p class="text mb-0">Maintenance</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="status-count">                        <div class="status-icon mb-3">
+                            <i class="fas fa-exclamation-triangle text-danger fa-2x"></i>
+                        </div>
+                        <h3 id="error-count">{{ overview.fault }}</h3>
+                        <p class="text mb-0">Faults</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4" data-aos="fade-right">
+                    <div class="chart-container dashboard-chart">
+                        <div class="chart-title">
+                            <i class="fas fa-industry"></i> Production Output
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="productionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4" data-aos="fade-left">
+                    <div class="chart-container dashboard-chart">
+                        <div class="chart-title">
+                            <i class="fas fa-tachometer-alt"></i> Process Efficiency
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="efficiencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Jump Navigation -->
+    <section class="mb-5" data-aos="fade-up">
+        <div class="process-jump-nav">
+            <div class="btn-group" role="group">
+                {% for process in processes %}
+                    <button type="button" class="btn btn-outline-primary" onclick="scrollToProcess('{{ process.id }}')">
+                        <span class="process-number">{{ process.order }}</span> {{ process.name }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    
+    <!-- Process Sections -->
+    {% for process in processes %}
+    <section id="process-{{ process.id }}" class="process-section mb-5" data-aos="fade-up">
+        <div class="process-header" data-aos="fade-right">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h3 class="mb-0">
+                        <span class="process-number">{{ process.order }}</span> {{ process.name }}
+                    </h3>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="badge bg-primary">{{ process.machine_count }} Machines</span>
+                </div>
+            </div>
+            <p class="text- mt-2 mb-0">{{ process.description }}</p>
+        </div>
+        
+        <div class="machine-cards">
+            {% for machine in process.machines %}            <a href="{{ url_for('machine_detail', process_name=process.name, machine_id=machine.id) }}" class="machine-card-link">
+                <div class="machine-card" data-machine-id="{{ machine.id }}" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ machine.name }}</h5>
+                        <div class="status-wrapper">
+                            <span class="status-indicator status-{{ machine.status }}"></span>
+                            <span class="badge {% if machine.status == 'running' %}bg-success{% elif machine.status == 'idle' %}bg-warning{% elif machine.status == 'maintenance' %}bg-info{% else %}bg-danger{% endif %}">
+                                {{ machine.status|capitalize }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if machine.image_url %}
+                        <img src="{{ url_for('static', filename=machine.image_url) }}" alt="{{ machine.name }}" class="machine-image img-fluid">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Machine image" class="machine-image img-fluid">
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-center">
+                        <span class="btn btn-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i> View Details
+                        </span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+</div>
+<!-- Alert Settings Modal -->
+<div class="modal fade" id="alertSettingsModal" tabindex="-1" aria-labelledby="alertSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alertSettingsModalLabel">
+                    <i class="fas fa-bell text-accent me-2"></i> Configure Alerts
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Set up alerts to be notified when certain conditions are met.</p>
+                
+                <!-- Tabs for different alert types -->
+                <ul class="nav nav-tabs mb-4" id="alertTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="threshold-tab" data-bs-toggle="tab" data-bs-target="#threshold" 
+                            type="button" role="tab" aria-controls="threshold" aria-selected="true">
+                            <i class="fas fa-chart-line me-2"></i>Threshold Alerts
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="predictive-tab" data-bs-toggle="tab" data-bs-target="#predictive" 
+                            type="button" role="tab" aria-controls="predictive" aria-selected="false">
+                            <i class="fas fa-brain me-2"></i>Predictive Alerts
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="operational-tab" data-bs-toggle="tab" data-bs-target="#operational" 
+                            type="button" role="tab" aria-controls="operational" aria-selected="false">
+                            <i class="fas fa-cogs me-2"></i>Operational Alerts
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Tab content -->
+                <div class="tab-content" id="alertTabContent">
+                    <!-- Threshold Alerts -->
+                    <div class="tab-pane fade show active" id="threshold" role="tabpanel" aria-labelledby="threshold-tab">
+                        <div class="alert-form">
+                            <div class="mb-4">
+                                <div class="form-group mb-3">
+                                    <label for="thresholdProcess" class="form-label">Process</label>
+                                    <select class="form-select" id="thresholdProcess">
+                                        <option selected>All Processes</option>
+                                        {% for process in processes %}
+                                        <option value="{{ process.id }}">{{ process.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="thresholdMachine" class="form-label">Machine</label>
+                                    <select class="form-select" id="thresholdMachine">
+                                        <option selected>All Machines</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="thresholdMetric" class="form-label">Metric</label>
+                                    <select class="form-select" id="thresholdMetric">
+                                        <option value="temperature">Temperature</option>
+                                        <option value="humidity">Humidity</option>
+                                        <option value="pressure">Pressure</option>
+                                        <option value="production">Production Output</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="thresholdMin" class="form-label">Min Value</label>
+                                            <input type="number" class="form-control" id="thresholdMin" placeholder="Min threshold">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="thresholdMax" class="form-label">Max Value</label>
+                                            <input type="number" class="form-control" id="thresholdMax" placeholder="Max threshold">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="thresholdPriority" class="form-label">Priority</label>
+                                    <select class="form-select" id="thresholdPriority">
+                                        <option value="high">High</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary add-alert-btn" id="addThresholdAlert">
+                                <i class="fas fa-plus-circle me-2"></i>Add Alert
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Predictive Alerts -->
+                    <div class="tab-pane fade" id="predictive" role="tabpanel" aria-labelledby="predictive-tab">
+                        <div class="alert-form">
+                            <div class="mb-4">
+                                <div class="form-group mb-3">
+                                    <label for="predictiveProcess" class="form-label">Process</label>
+                                    <select class="form-select" id="predictiveProcess">
+                                        <option selected>All Processes</option>
+                                        {% for process in processes %}
+                                        <option value="{{ process.id }}">{{ process.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="predictiveType" class="form-label">Alert Type</label>
+                                    <select class="form-select" id="predictiveType">
+                                        <option value="maintenance">Maintenance Required</option>
+                                        <option value="failure">Failure Prediction</option>
+                                        <option value="quality">Quality Deviation</option>
+                                        <option value="anomaly">Anomaly Detection</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="predictionWindow" class="form-label">Time Window (hours)</label>
+                                    <select class="form-select" id="predictionWindow">
+                                        <option value="12">12 hours</option>
+                                        <option value="24" selected>24 hours</option>
+                                        <option value="48">48 hours</option>
+                                        <option value="72">72 hours</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="confidenceThreshold" class="form-label">Confidence Threshold (%)</label>
+                                    <input type="range" class="form-range" min="50" max="99" value="80" id="confidenceThreshold">
+                                    <div class="d-flex justify-content-between">
+                                        <span>50%</span>
+                                        <span id="confidenceValue">80%</span>
+                                        <span>99%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary add-alert-btn" id="addPredictiveAlert">
+                                <i class="fas fa-plus-circle me-2"></i>Add Alert
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Operational Alerts -->
+                    <div class="tab-pane fade" id="operational" role="tabpanel" aria-labelledby="operational-tab">
+                        <div class="alert-form">
+                            <div class="mb-4">
+                                <div class="form-group mb-3">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="statusChangeAlert" checked>
+                                        <label class="form-check-label" for="statusChangeAlert">
+                                            Machine Status Change
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="errorAlert" checked>
+                                        <label class="form-check-label" for="errorAlert">
+                                            Error Conditions
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="systemAlert">
+                                        <label class="form-check-label" for="systemAlert">
+                                            System Updates
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="productionAlert">
+                                        <label class="form-check-label" for="productionAlert">
+                                            Production Milestones
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="notificationMethod" class="form-label">Notification Methods</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="dashboardNotif" checked>
+                                            <label class="form-check-label" for="dashboardNotif">Dashboard</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                                            <label class="form-check-label" for="emailNotif">Email</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="smsNotif">
+                                            <label class="form-check-label" for="smsNotif">SMS</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="pushNotif">
+                                            <label class="form-check-label" for="pushNotif">Push</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary add-alert-btn" id="saveOperationalAlerts">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Current Alerts Section -->
+                <div class="current-alerts mt-5">
+                    <h6><i class="fas fa-list-ul me-2"></i>Current Alerts</h6>
+                    <div class="alert-list">
+                        <div class="alert-item">
+                            <div class="alert-info">
+                                <span class="alert-type high"><i class="fas fa-thermometer-full me-2"></i>Temperature</span>
+                                <span class="alert-details">Withering Trough - Above 85°C</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger delete-alert">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-info">
+                                <span class="alert-type medium"><i class="fas fa-tachometer-alt me-2"></i>Pressure</span>
+                                <span class="alert-details">Drum Dryer - Below 2.5 bar</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger delete-alert">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-info">
+                                <span class="alert-type low"><i class="fas fa-brain me-2"></i>Maintenance</span>
+                                <span class="alert-details">Orthodox Roller - Due in 72 hours</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger delete-alert">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveAllAlerts">
+                    <i class="fas fa-save me-2"></i>Save All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Alert Modal Styling */
+    .modal-content {
+        background-color: var(--dark-color-light);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-color);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .modal-title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .modal-title i.text-accent {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+        background: rgba(34, 211, 238, 0.1);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .btn-close {
+        color: var(--text-color);
+        opacity: 0.5;
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    
+    /* Alert Form Styling */
+    .form-label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--text-color);
+    }
+    
+    .form-select, .form-control {
+        background-color: var(--dark-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        border-radius: 8px;
+    }
+    
+    .form-select:focus, .form-control:focus {
+        background-color: var(--dark-color);
+        border-color: var(--primary-color);
+        color: var(--text-color);
+        box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+    }
+    
+    /* Nav Tabs */
+    .nav-tabs {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .nav-tabs .nav-link {
+        color: var(--text-muted);
+        border: none;
+        padding: 0.75rem 1rem;
+        margin-right: 1rem;
+        background-color: transparent;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        color: var(--accent-color);
+        border-color: transparent;
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: var(--accent-color);
+        background-color: transparent;
+        border-bottom: 2px solid var(--accent-color);
+    }
+    
+    /* Alert Items */
+    .current-alerts h6 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-list {
+        background-color: var(--dark-color);
+        border-radius: 8px;
+        padding: 0;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .alert-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+    
+    .alert-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .alert-item:last-child {
+        border-bottom: none;
+    }
+    
+    .alert-info {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .alert-type {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+    }
+    
+    .alert-type.high {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #EF4444;
+    }
+    
+    .alert-type.medium {
+        background-color: rgba(245, 158, 11, 0.2);
+        color: #F59E0B;
+    }
+    
+    .alert-type.low {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #10B981;
+    }
+    
+    .alert-details {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+    
+    /* Form Range Customization */
+    .form-range {
+        height: 1.5rem;
+        padding: 0;
+        background-color: transparent;
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: var(--primary-color);
+    }
+    
+    .form-range::-webkit-slider-runnable-track {
+        background: var(--border-color);
+    }
+    
+    /* Checkbox Styling */
+    .form-check-input {
+        background-color: var(--dark-color);
+        border: 1px solid var(--border-color);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .add-alert-btn {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chart-enhancement.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to Process Function
+        window.scrollToProcess = function(processId) {
+            const element = document.getElementById('process-' + processId);
+            const headerOffset = 100;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        };
+        
+        // Sample Charts
+        const productionCtx = document.getElementById('productionChart').getContext('2d');
+        const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
+          // Helper function to generate smoother data
+        function generateSmoothData(baseData) {
+            const smoothedData = [];
+            for (let i = 0; i < baseData.length; i++) {
+                if (i === 0) {
+                    smoothedData.push(baseData[i]);
+                } else {
+                    // Apply some smoothing by averaging with adjacent points
+                    const prev = baseData[i-1];
+                    const current = baseData[i];
+                    
+                    // 70% current value, 30% previous trend
+                    smoothedData.push(current * 0.7 + prev * 0.3);
+                }
+            }
+            return smoothedData;
+        }
+        
+        // Sample data for charts with smoother values
+        const productionData = {
+            labels: ['8AM', '10AM', '12PM', '2PM', '4PM', '6PM'],
+            datasets: [{
+                label: 'Production (kg)',
+                data: generateSmoothData([650, 750, 800, 850, 900, 850]),
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                tension: 0.5, // Increased tension for smoother curve
+                fill: {
+                    target: 'origin',
+                    above: 'rgba(79, 70, 229, 0.2)'
+                },
+                pointBackgroundColor: '#4F46E5',
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                borderWidth: 2.5,
+                cubicInterpolationMode: 'monotone'
+            }]
+        };
+        
+        const efficiencyData = {
+            labels: ['Withering', 'Rolling', 'Fermentation', 'Drying', 'Sorting', 'Packing'],
+            datasets: [{
+                label: 'Efficiency (%)',
+                data: [92, 86, 94, 89, 95, 90],
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.7)',
+                    'rgba(245, 158, 11, 0.7)',
+                    'rgba(34, 211, 238, 0.7)',
+                    'rgba(99, 102, 241, 0.7)',
+                    'rgba(139, 92, 246, 0.7)',
+                    'rgba(236, 72, 153, 0.7)'
+                ],
+                borderWidth: 0
+            }]
+        };          const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: true, // Change to true to maintain aspect ratio
+            aspectRatio: 2, // Set a fixed aspect ratio for consistent sizing
+            // Enhanced animation settings
+            animation: {
+                duration: 800,
+                easing: 'easeOutQuart'
+            },
+            // Smoother transitions
+            transitions: {
+                active: {
+                    animation: {
+                        duration: 400,
+                        easing: 'easeOutCubic'
+                    }
+                }
+            },
+            // Enhanced interactions
+            interaction: {
+                mode: 'index',
+                intersect: false,
+                includeInvisible: false
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#E5E7EB',
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    titleColor: '#E5E7EB',
+                    bodyColor: '#E5E7EB',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y.toFixed(1);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        tickLength: 8,
+                        tickWidth: 1
+                    },
+                    ticks: {
+                        color: '#9CA3AF',
+                        padding: 12, // Increased padding for better visibility
+                        font: {
+                            size: 11
+                        }
+                    },
+                    border: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    afterFit: function(scaleInstance) {
+                        // Add additional bottom padding to ensure labels are fully visible
+                        scaleInstance.height = scaleInstance.height + 15;
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)',
+                        tickLength: 8,
+                        tickWidth: 1
+                    },
+                    ticks: {
+                        color: '#9CA3AF',
+                        padding: 8,
+                        font: {
+                            size: 11
+                        },
+                        count: 6
+                    },
+                    border: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.4,
+                    borderCapStyle: 'round',
+                    borderJoinStyle: 'round',
+                    capBezierPoints: true
+                },
+                point: {
+                    radius: 3,
+                    hoverRadius: 6,
+                    hitRadius: 25,
+                    pointStyle: 'circle',
+                    hoverBorderWidth: 2
+                },
+                bar: {
+                    borderRadius: 6,
+                    borderWidth: 0
+                }
+            }
+        };          // Create charts with specific configurations for each
+        try {
+            if (productionCtx) {
+                const productionChart = new Chart(productionCtx, {
+                    type: 'line',
+                    data: productionData,
+                    options: {
+                        ...chartOptions,
+                        maintainAspectRatio: true, // Force aspect ratio maintenance
+                        aspectRatio: 2, // Fixed aspect ratio for proper display
+                        onResize: function(chart, size) {
+                            // Prevent excessive growth by enforcing maximum dimensions
+                            if (size.height > 500) {
+                                chart.height = 500;
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error("Production chart context not found");
+            }
+            
+            if (efficiencyCtx) {
+                const efficiencyChart = new Chart(efficiencyCtx, {
+                    type: 'bar',
+                    data: efficiencyData,
+                    options: chartOptions
+                });
+            } else {
+                console.error("Efficiency chart context not found");
+            }
+        } catch (error) {
+            console.error("Error initializing charts:", error);
+        }
+        // Alert Settings Modal Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update confidence value display when slider changes
+            const confidenceSlider = document.getElementById('confidenceThreshold');
+            const confidenceValue = document.getElementById('confidenceValue');
+            
+            if (confidenceSlider && confidenceValue) {
+                confidenceSlider.addEventListener('input', function() {
+                    confidenceValue.textContent = this.value + '%';
+                });
+            }
+            
+            // Handle dynamic machine dropdown based on process selection
+            const thresholdProcess = document.getElementById('thresholdProcess');
+            const thresholdMachine = document.getElementById('thresholdMachine');
+            
+            if (thresholdProcess && thresholdMachine) {
+                thresholdProcess.addEventListener('change', function() {
+                    const processId = this.value;
+                    
+                    // Clear current options
+                    thresholdMachine.innerHTML = '<option selected>All Machines</option>';
+                    
+                    // Skip if "All Processes" is selected
+                    if (processId === 'All Processes') return;
+                    
+                    // Find the selected process
+                    const selectedProcess = processes.find(p => p.id.toString() === processId);
+                    if (selectedProcess) {
+                        // Add machine options
+                        selectedProcess.machines.forEach(machine => {
+                            const option = document.createElement('option');
+                            option.value = machine.id;
+                            option.textContent = machine.name;
+                            thresholdMachine.appendChild(option);
+                        });
+                    }
+                });
+            }
+            
+            // Handle the add threshold alert button
+            const addThresholdAlertBtn = document.getElementById('addThresholdAlert');
+            if (addThresholdAlertBtn) {
+                addThresholdAlertBtn.addEventListener('click', function() {
+                    // Get input values
+                    const process = document.getElementById('thresholdProcess').value;
+                    const machine = document.getElementById('thresholdMachine').value;
+                    const metric = document.getElementById('thresholdMetric').value;
+                    const minValue = document.getElementById('thresholdMin').value;
+                    const maxValue = document.getElementById('thresholdMax').value;
+                    const priority = document.getElementById('thresholdPriority').value;
+                    
+                    // Validate inputs
+                    if (metric === '') {
+                        showToast('Please select a metric', 'warning');
+                        return;
+                    }
+                    
+                    if (minValue === '' && maxValue === '') {
+                        showToast('Please enter at least one threshold value', 'warning');
+                        return;
+                    }
+                    
+                    // Create new alert item
+                    createAlertItem(metric, machine !== 'All Machines' ? machine : process, minValue, maxValue, priority);
+                    showToast('Alert added successfully', 'success');
+                    
+                    // Reset form
+                    document.getElementById('thresholdMin').value = '';
+                    document.getElementById('thresholdMax').value = '';
+                });
+            }
+            
+            // Handle the add predictive alert button
+            const addPredictiveAlertBtn = document.getElementById('addPredictiveAlert');
+            if (addPredictiveAlertBtn) {
+                addPredictiveAlertBtn.addEventListener('click', function() {
+                    // Get input values
+                    const process = document.getElementById('predictiveProcess').value;
+                    const type = document.getElementById('predictiveType').value;
+                    const window = document.getElementById('predictionWindow').value;
+                    const confidence = document.getElementById('confidenceThreshold').value;
+                    
+                    // Create new alert item
+                    createAlertItem(type, process, null, null, 'medium', `${window}h, ${confidence}%`);
+                    showToast('Predictive alert added successfully', 'success');
+                });
+            }
+            
+            // Handle save operational alerts button
+            const saveOperationalAlertsBtn = document.getElementById('saveOperationalAlerts');
+            if (saveOperationalAlertsBtn) {
+                saveOperationalAlertsBtn.addEventListener('click', function() {
+                    showToast('Operational alert settings saved', 'success');
+                });
+            }
+            
+            // Handle save all alerts button
+            const saveAllAlertsBtn = document.getElementById('saveAllAlerts');
+            if (saveAllAlertsBtn) {
+                saveAllAlertsBtn.addEventListener('click', function() {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('alertSettingsModal'));
+                    modal.hide();
+                    showToast('All alert settings have been saved', 'success');
+                });
+            }
+            
+            // Handle delete alert buttons
+            document.querySelectorAll('.delete-alert').forEach(button => {
+                button.addEventListener('click', function() {
+                    const alertItem = this.closest('.alert-item');
+                    alertItem.style.height = '0';
+                    alertItem.style.padding = '0';
+                    alertItem.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        alertItem.remove();
+                    }, 300);
+                    
+                    showToast('Alert removed', 'info');
+                });
+            });
+            
+            // Function to create a new alert item
+            function createAlertItem(type, target, min, max, priority, extra = null) {
+                const alertList = document.querySelector('.alert-list');
+                if (!alertList) return;
+                
+                // Create alert item elements
+                const alertItem = document.createElement('div');
+                alertItem.className = 'alert-item';
+                
+                // Format display text based on the type of alert
+                let iconClass = 'fas fa-bell';
+                let displayText = '';
+                
+                switch (type) {
+                    case 'temperature':
+                        iconClass = 'fas fa-thermometer-full';
+                        displayText = min ? `Above ${min}°C` : `Below ${max}°C`;
+                        break;
+                    case 'humidity':
+                        iconClass = 'fas fa-tint';
+                        displayText = min ? `Above ${min}%` : `Below ${max}%`;
+                        break;
+                    case 'pressure':
+                        iconClass = 'fas fa-tachometer-alt';
+                        displayText = min ? `Above ${min} bar` : `Below ${max} bar`;
+                        break;
+                    case 'production':
+                        iconClass = 'fas fa-industry';
+                        displayText = min ? `Below ${min} kg/h` : `Above ${max} kg/h`;
+                        break;
+                    case 'maintenance':
+                        iconClass = 'fas fa-tools';
+                        displayText = `Due in ${extra || 'future'}`;
+                        break;
+                    case 'failure':
+                        iconClass = 'fas fa-exclamation-triangle';
+                        displayText = `Risk: ${extra || 'high'}`;
+                        break;
+                    case 'quality':
+                        iconClass = 'fas fa-check-circle';
+                        displayText = `Deviation detected`;
+                        break;
+                    case 'anomaly':
+                        iconClass = 'fas fa-exclamation-circle';
+                        displayText = `Anomaly detection`;
+                        break;
+                }
+                
+                // Create alert item HTML structure
+                alertItem.innerHTML = `
+                    <div class="alert-info">
+                        <span class="alert-type ${priority}"><i class="${iconClass} me-2"></i>${type}</span>
+                        <span class="alert-details">${target} - ${displayText}</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-alert">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                
+                // Add to alert list
+                alertList.prepend(alertItem);
+                
+                // Add event listener for the delete button
+                alertItem.querySelector('.delete-alert').addEventListener('click', function() {
+                    alertItem.style.height = '0';
+                    alertItem.style.padding = '0';
+                    alertItem.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        alertItem.remove();
+                    }, 300);
+                    
+                    showToast('Alert removed', 'info');
+                });
+                
+                // Apply transition effect
+                setTimeout(() => {
+                    alertItem.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    setTimeout(() => {
+                        alertItem.style.backgroundColor = '';
+                    }, 500);
+                }, 10);
+            }
+            
+            // Toast notification function
+            function showToast(message, type = 'info') {
+                // Colors based on type
+                const bgColors = {
+                    success: '#10B981',
+                    warning: '#F59E0B',
+                    danger: '#EF4444',
+                    info: '#3B82F6'
+                };
+                
+                // Create toast container if it doesn't exist
+                let toastContainer = document.querySelector('.toast-container');
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                    toastContainer.style.zIndex = '9999';
+                    document.body.appendChild(toastContainer);
+                }
+                
+                // Create toast
+                const toastId = 'toast-' + Date.now();
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.id = toastId;
+                toast.innerHTML = `
+                    <div class="toast-header" style="background-color: ${bgColors[type] || bgColors.info}; color: white;">
+                        <strong class="me-auto">Tea Processing Monitor</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" style="background-color: var(--dark-color-light); color: var(--text-color);">
+                        ${message}
+                    </div>
+                `;
+                
+                // Add to container
+                toastContainer.appendChild(toast);
+                
+                // Initialize and show toast
+                const toastInstance = new bootstrap.Toast(toast, {
+                    delay: 3000
+                });
+                toastInstance.show();
+                
+                // Remove toast when hidden
+                toast.addEventListener('hidden.bs.toast', function() {
+                    this.remove();
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

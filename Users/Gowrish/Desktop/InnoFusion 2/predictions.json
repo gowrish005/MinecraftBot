@@ -1,0 +1,20 @@
+{
+  "status": "HEALTHY",
+  "confidence": 0.98,
+  "time_to_failure": 51.7,
+  "health_probabilities": [
+    0.98,
+    0.014,
+    0.006
+  ],
+  "failure_predictions": [
+    0.032,
+    0.039,
+    0.044,
+    0.025,
+    0.047,
+    0.031
+  ],
+  "timestamp": "2025-07-27T06:44:07.964698",
+  "health_score": 1.0
+}

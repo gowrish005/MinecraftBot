@@ -1,0 +1,343 @@
+/* Predictive Maintenance Section Styles */
+.predictive-maintenance-card {
+    background-color: var(--dark-color-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Card Header */
+.bg-gradient-primary {
+    background: var(--gradient-primary);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.glow-effect {
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.4) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.ai-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+}
+
+.pulse-effect {
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.ai-badge {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Body */
+.themed-card-body {
+    background-color: var(--dark-color-light);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.themed-card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Prediction Cards */
+.prediction-card {
+    background-color: rgba(31, 41, 55, 0.5);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.prediction-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.prediction-header {
+    margin-bottom: 1rem;
+}
+
+.prediction-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary-light);
+    display: flex;
+    align-items: center;
+}
+
+.prediction-content {
+    position: relative;
+}
+
+.prediction-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+}
+
+.prediction-icon {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.prediction-value {
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    color: var(--text-color);
+}
+
+.prediction-meta {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Component Health */
+.health-item {
+    margin-bottom: 1.2rem;
+}
+
+.component-name {
+    font-weight: 500;
+}
+
+.component-value {
+    font-weight: 600;
+}
+
+.component-progress {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+.component-progress .progress-bar {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: width 1s ease-in-out;
+}
+
+.component-progress .progress-bar.warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #fd7e14 100%);
+}
+
+.component-progress .progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 100%;
+    }
+}
+
+/* Schedule Table */
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.maintenance-table {
+    color: var(--text-color);
+    background-color: rgba(31, 41, 55, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.maintenance-table thead {
+    background-color: rgba(79, 70, 229, 0.1);
+}
+
+.maintenance-table th {
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.maintenance-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.maintenance-table tr:last-child td {
+    border-bottom: none;
+}
+
+.maintenance-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.maintenance-type {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.maintenance-type.preventive {
+    background-color: rgba(79, 70, 229, 0.2);
+    color: #6366F1;
+    border: 1px solid rgba(79, 70, 229, 0.3);
+}
+
+.maintenance-type.routine {
+    background-color: rgba(34, 211, 238, 0.2);
+    color: #22D3EE;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+.maintenance-type.overhaul {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.maintenance-type.critical {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.priority-badge.high {
+    background-color: var(--fault-color);
+    color: white;
+}
+
+.priority-badge.medium {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.priority-badge.low {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Info Panel */
+.info-panel {
+    display: flex;
+    align-items: center;
+    background-color: rgba(34, 211, 238, 0.1);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    margin-right: 1rem;
+}
+
+.info-content {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .prediction-card {
+        padding: 1rem;
+    }
+    
+    .prediction-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .prediction-value {
+        font-size: 1.1rem;
+    }
+    
+    .maintenance-table th,
+    .maintenance-table td {
+        padding: 0.75rem;
+    }
+    
+    .maintenance-type,
+    .priority-badge {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}

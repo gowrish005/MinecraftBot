@@ -1,0 +1,146 @@
+/* Chart Enhancement Styles */
+.chart-container {
+    transition: all 0.3s ease;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem 1.5rem 3rem; /* Extra padding at the bottom for x-axis labels */
+    background-color: var(--dark-color-light);
+    border: 1px solid var(--border-color);
+    position: relative;
+    z-index: 1;
+    height: 400px; /* Fixed height for consistency */
+    max-height: 400px; /* Maximum height to prevent growth */
+    width: 100%; /* Use full width */
+    margin-bottom: 2rem; /* Add space between elements */
+}
+
+/* Gradient top border */
+.chart-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+    opacity: 0.8;
+    transition: all 0.4s ease;
+    border-radius: 3px 3px 0 0;
+    z-index: 2;
+}
+
+/* Subtle background pattern */
+.chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.03) 0%, transparent 75%);
+    background-size: 15px 15px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.chart-container canvas {
+    transition: none; /* Remove transition for stability */
+    padding: 0.5rem;
+    margin-top: 1rem;
+    position: relative;
+    z-index: 1;
+    height: 300px !important; /* Fixed height for stability */
+    width: 100% !important; /* Ensure canvas uses full width */
+    display: block; /* Eliminate inline spacing issues */
+    object-fit: contain; /* Maintain aspect ratio without stretching */
+}
+
+/* Enhanced hover effect */
+.chart-container:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25), 0 8px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+.chart-container:hover::after {
+    opacity: 1;
+    height: 5px;
+}
+
+.chart-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--light-text);
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 0.5rem 0.5rem 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    height: 40px; /* Fixed height for title to ensure consistent chart area */
+}
+
+.chart-title i {
+    margin-right: 0.75rem;
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    background: rgba(34, 211, 238, 0.1);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover .chart-title i {
+    transform: scale(1.1);
+    background: rgba(34, 211, 238, 0.2);
+}
+
+/* Dashboard specific chart styles for stability */
+.dashboard-chart {
+    height: 400px !important;
+    margin-bottom: 1.5rem;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: calc(100% - 40px); /* Account for title height */
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Time range selector styling */
+.time-range-selector {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.time-range {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.time-range.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-color: transparent;
+}
+
+/* Tooltip customization */
+.chart-tooltip {
+    background-color: rgba(17, 24, 39, 0.95) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px !important;
+}

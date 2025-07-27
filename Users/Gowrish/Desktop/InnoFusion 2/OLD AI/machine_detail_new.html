@@ -1,0 +1,749 @@
+{% extends "base.html" %}
+
+{% block title %}{{ machine.name }} - Machine Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/machine-detail-new.css') }}">
+<style>
+    .real-time-metrics {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        border-radius: 15px;
+        padding: 25px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .metric-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .chart-container {
+        height: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .ai-health-status {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 25px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    
+    .health-indicator {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 10px 0;
+    }
+    
+    .health-healthy { background: rgba(39, 174, 96, 0.8); }
+    .health-warning { background: rgba(243, 156, 18, 0.8); }
+    .health-critical { background: rgba(231, 76, 60, 0.8); }
+    
+    .simulation-controls {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 25px;
+        color: white;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .slider-container {
+        margin: 15px 0;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+    
+    .slider {
+        width: 100%;
+        margin: 10px 0;
+    }
+    
+    .parameter-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        margin: 5px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-4 mb-0">{{ machine.name }}</h1>
+                    <p class="lead text-muted">{{ process_name }} Process</p>
+                </div>
+                <div>
+                    <button id="start-simulation" class="btn btn-success btn-lg me-2">
+                        <i class="fas fa-play"></i> Start AI Simulation
+                    </button>
+                    <button id="stop-simulation" class="btn btn-danger btn-lg" disabled>
+                        <i class="fas fa-stop"></i> Stop Simulation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Real-time Metrics -->
+        <div class="col-lg-8">
+            <!-- AI Health Status -->
+            <div class="ai-health-status">
+                <h3><i class="fas fa-brain me-2"></i>AI Health Analysis</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div id="health-indicator" class="health-indicator health-healthy">
+                            <div id="health-status">INITIALIZING</div>
+                            <small>System Status</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="metric-card text-center">
+                            <h4>Confidence Level</h4>
+                            <div id="confidence-level" class="h2">---%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="metric-card text-center">
+                            <h4>Time to Failure</h4>
+                            <div id="time-to-failure" class="h2">--- hours</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Sensor Metrics -->
+            <div class="real-time-metrics">
+                <h3><i class="fas fa-chart-line me-2"></i>Real-time Sensor Monitoring</h3>
+                
+                <div class="row">
+                    <!-- Temperature -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5><i class="fas fa-thermometer-half text-danger me-2"></i>Temperature</h5>
+                            <div class="chart-container">
+                                <canvas id="temperatureChart"></canvas>
+                            </div>
+                            <div class="parameter-value">
+                                <span id="temp-value">28.0</span> °C
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Humidity -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5><i class="fas fa-tint text-info me-2"></i>Humidity</h5>
+                            <div class="chart-container">
+                                <canvas id="humidityChart"></canvas>
+                            </div>
+                            <div class="parameter-value">
+                                <span id="humidity-value">65.0</span> %
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Air Flow Rate -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5><i class="fas fa-wind text-success me-2"></i>Air Flow Rate</h5>
+                            <div class="chart-container">
+                                <canvas id="airflowChart"></canvas>
+                            </div>
+                            <div class="parameter-value">
+                                <span id="airflow-value">120.0</span> CFM
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fan Speed -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5><i class="fas fa-fan text-warning me-2"></i>Fan Speed</h5>
+                            <div class="chart-container">
+                                <canvas id="fanSpeedChart"></canvas>
+                            </div>
+                            <div class="parameter-value">
+                                <span id="fanspeed-value">2200</span> RPM
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Heating Power -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5><i class="fas fa-fire text-danger me-2"></i>Heating Power</h5>
+                            <div class="chart-container">
+                                <canvas id="heatingPowerChart"></canvas>
+                            </div>
+                            <div class="parameter-value">
+                                <span id="heating-value">15.0</span> kW
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fan Power -->
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5><i class="fas fa-bolt text-primary me-2"></i>Fan Power</h5>
+                            <div class="chart-container">
+                                <canvas id="fanPowerChart"></canvas>
+                            </div>
+                            <div class="parameter-value">
+                                <span id="fanpower-value">225.0</span> W
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Simulation Controls -->
+        <div class="col-lg-4">
+            <div class="simulation-controls">
+                <h3><i class="fas fa-sliders-h me-2"></i>Simulation Controls</h3>
+                <p class="mb-4">Control sensor parameters to simulate different operating conditions</p>
+                
+                <!-- Temperature Control -->
+                <div class="slider-container">
+                    <label for="temp-slider" class="form-label">
+                        <i class="fas fa-thermometer-half me-2"></i>Temperature (°C)
+                    </label>
+                    <input type="range" id="temp-slider" class="form-range slider" 
+                           min="15" max="40" step="0.1" value="28.0">
+                    <div class="parameter-value">
+                        <span id="temp-display">28.0</span> °C
+                    </div>
+                </div>
+                
+                <!-- Humidity Control -->
+                <div class="slider-container">
+                    <label for="humidity-slider" class="form-label">
+                        <i class="fas fa-tint me-2"></i>Humidity (%)
+                    </label>
+                    <input type="range" id="humidity-slider" class="form-range slider" 
+                           min="30" max="90" step="0.1" value="65.0">
+                    <div class="parameter-value">
+                        <span id="humidity-display">65.0</span> %
+                    </div>
+                </div>
+                
+                <!-- Air Flow Rate Control -->
+                <div class="slider-container">
+                    <label for="airflow-slider" class="form-label">
+                        <i class="fas fa-wind me-2"></i>Air Flow Rate (CFM)
+                    </label>
+                    <input type="range" id="airflow-slider" class="form-range slider" 
+                           min="60" max="180" step="0.1" value="120.0">
+                    <div class="parameter-value">
+                        <span id="airflow-display">120.0</span> CFM
+                    </div>
+                </div>
+                
+                <!-- Fan Speed Control -->
+                <div class="slider-container">
+                    <label for="fanspeed-slider" class="form-label">
+                        <i class="fas fa-fan me-2"></i>Fan Speed (RPM)
+                    </label>
+                    <input type="range" id="fanspeed-slider" class="form-range slider" 
+                           min="1500" max="2800" step="1" value="2200">
+                    <div class="parameter-value">
+                        <span id="fanspeed-display">2200</span> RPM
+                    </div>
+                </div>
+                
+                <!-- Heating Power Control -->
+                <div class="slider-container">
+                    <label for="heating-slider" class="form-label">
+                        <i class="fas fa-fire me-2"></i>Heating Power (kW)
+                    </label>
+                    <input type="range" id="heating-slider" class="form-range slider" 
+                           min="8" max="20" step="0.1" value="15.0">
+                    <div class="parameter-value">
+                        <span id="heating-display">15.0</span> kW
+                    </div>
+                </div>
+                
+                <!-- Fan Power Control -->
+                <div class="slider-container">
+                    <label for="fanpower-slider" class="form-label">
+                        <i class="fas fa-bolt me-2"></i>Fan Power (W)
+                    </label>
+                    <input type="range" id="fanpower-slider" class="form-range slider" 
+                           min="150" max="300" step="0.1" value="225.0">
+                    <div class="parameter-value">
+                        <span id="fanpower-display">225.0</span> W
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button id="reset-defaults" class="btn btn-outline-light btn-block">
+                        <i class="fas fa-undo me-2"></i>Reset to Defaults
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the AI monitoring system
+    let isSimulating = false;
+    let simulationInterval = null;
+    let charts = {};
+    let sensorData = {
+        timestamps: [],
+        temperature: [],
+        humidity: [],
+        airflow: [],
+        fanSpeed: [],
+        heatingPower: [],
+        fanPower: []
+    };
+    
+    const MAX_DATA_POINTS = 50;
+    
+    // AI Parameter definitions (matching the AI system)
+    const parameters = {
+        'Temperature': { min: 15.0, max: 40.0, default: 28.0, unit: '°C', color: '#EF4444' },
+        'Humidity': { min: 30.0, max: 90.0, default: 65.0, unit: '%', color: '#3B82F6' },
+        'Air_Flow_Rate': { min: 60.0, max: 180.0, default: 120.0, unit: 'CFM', color: '#10B981' },
+        'Fan_Speed': { min: 1500, max: 2800, default: 2200, unit: 'RPM', color: '#F59E0B' },
+        'Heating_Power': { min: 8.0, max: 20.0, default: 15.0, unit: 'kW', color: '#8B5CF6' },
+        'Fan_Power': { min: 150.0, max: 300.0, default: 225.0, unit: 'W', color: '#EC4899' }
+    };
+    
+    // Initialize charts
+    function initializeCharts() {
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 0 },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.8)' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        };
+        
+        // Temperature Chart
+        charts.temperature = new Chart(document.getElementById('temperatureChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: parameters.Temperature.color,
+                    backgroundColor: parameters.Temperature.color + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Humidity Chart
+        charts.humidity = new Chart(document.getElementById('humidityChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: parameters.Humidity.color,
+                    backgroundColor: parameters.Humidity.color + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Air Flow Chart
+        charts.airflow = new Chart(document.getElementById('airflowChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: parameters.Air_Flow_Rate.color,
+                    backgroundColor: parameters.Air_Flow_Rate.color + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Fan Speed Chart
+        charts.fanSpeed = new Chart(document.getElementById('fanSpeedChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: parameters.Fan_Speed.color,
+                    backgroundColor: parameters.Fan_Speed.color + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Heating Power Chart
+        charts.heatingPower = new Chart(document.getElementById('heatingPowerChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: parameters.Heating_Power.color,
+                    backgroundColor: parameters.Heating_Power.color + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+        
+        // Fan Power Chart
+        charts.fanPower = new Chart(document.getElementById('fanPowerChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: parameters.Fan_Power.color,
+                    backgroundColor: parameters.Fan_Power.color + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartOptions
+        });
+    }
+    
+    // Get current sensor values from sliders
+    function getCurrentSensorValues() {
+        return {
+            Temperature: parseFloat(document.getElementById('temp-slider').value),
+            Humidity: parseFloat(document.getElementById('humidity-slider').value),
+            Air_Flow_Rate: parseFloat(document.getElementById('airflow-slider').value),
+            Fan_Speed: parseInt(document.getElementById('fanspeed-slider').value),
+            Heating_Power: parseFloat(document.getElementById('heating-slider').value),
+            Fan_Power: parseFloat(document.getElementById('fanpower-slider').value)
+        };
+    }
+    
+    // Update charts with new data
+    function updateCharts(values) {
+        const timestamp = new Date().toLocaleTimeString();
+        
+        // Add new data point
+        sensorData.timestamps.push(timestamp);
+        sensorData.temperature.push(values.Temperature);
+        sensorData.humidity.push(values.Humidity);
+        sensorData.airflow.push(values.Air_Flow_Rate);
+        sensorData.fanSpeed.push(values.Fan_Speed);
+        sensorData.heatingPower.push(values.Heating_Power);
+        sensorData.fanPower.push(values.Fan_Power);
+        
+        // Keep only last MAX_DATA_POINTS
+        if (sensorData.timestamps.length > MAX_DATA_POINTS) {
+            sensorData.timestamps.shift();
+            sensorData.temperature.shift();
+            sensorData.humidity.shift();
+            sensorData.airflow.shift();
+            sensorData.fanSpeed.shift();
+            sensorData.heatingPower.shift();
+            sensorData.fanPower.shift();
+        }
+        
+        // Update each chart
+        charts.temperature.data.labels = sensorData.timestamps;
+        charts.temperature.data.datasets[0].data = sensorData.temperature;
+        charts.temperature.update('none');
+        
+        charts.humidity.data.labels = sensorData.timestamps;
+        charts.humidity.data.datasets[0].data = sensorData.humidity;
+        charts.humidity.update('none');
+        
+        charts.airflow.data.labels = sensorData.timestamps;
+        charts.airflow.data.datasets[0].data = sensorData.airflow;
+        charts.airflow.update('none');
+        
+        charts.fanSpeed.data.labels = sensorData.timestamps;
+        charts.fanSpeed.data.datasets[0].data = sensorData.fanSpeed;
+        charts.fanSpeed.update('none');
+        
+        charts.heatingPower.data.labels = sensorData.timestamps;
+        charts.heatingPower.data.datasets[0].data = sensorData.heatingPower;
+        charts.heatingPower.update('none');
+        
+        charts.fanPower.data.labels = sensorData.timestamps;
+        charts.fanPower.data.datasets[0].data = sensorData.fanPower;
+        charts.fanPower.update('none');
+        
+        // Update current value displays
+        document.getElementById('temp-value').textContent = values.Temperature.toFixed(1);
+        document.getElementById('humidity-value').textContent = values.Humidity.toFixed(1);
+        document.getElementById('airflow-value').textContent = values.Air_Flow_Rate.toFixed(1);
+        document.getElementById('fanspeed-value').textContent = values.Fan_Speed;
+        document.getElementById('heating-value').textContent = values.Heating_Power.toFixed(1);
+        document.getElementById('fanpower-value').textContent = values.Fan_Power.toFixed(1);
+    }
+    
+    // Get AI prediction for current sensor values
+    async function getAIPrediction(sensorValues) {
+        try {
+            // Convert to array format expected by AI model
+            const sensorArray = [
+                sensorValues.Temperature,
+                sensorValues.Humidity,
+                sensorValues.Air_Flow_Rate,
+                sensorValues.Fan_Speed,
+                sensorValues.Heating_Power,
+                sensorValues.Fan_Power
+            ];
+            
+            const response = await fetch('/api/ai-predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sensor_data: [sensorArray] // Send as sequence of 1 for immediate prediction
+                })
+            });
+            
+            if (response.ok) {
+                return await response.json();
+            } else {
+                // Fallback to heuristic prediction
+                return generateHeuristicPrediction(sensorValues);
+            }
+        } catch (error) {
+            console.log('Using fallback prediction:', error);
+            return generateHeuristicPrediction(sensorValues);
+        }
+    }
+    
+    // Fallback heuristic prediction
+    function generateHeuristicPrediction(values) {
+        let score = 1.0;
+        let issues = [];
+        
+        // Check each parameter against safe ranges
+        if (values.Temperature < 22 || values.Temperature > 32) {
+            score -= 0.2;
+            issues.push('Temperature out of optimal range');
+        }
+        if (values.Humidity < 45 || values.Humidity > 75) {
+            score -= 0.2;
+            issues.push('Humidity out of optimal range');
+        }
+        if (values.Air_Flow_Rate < 90 || values.Air_Flow_Rate > 140) {
+            score -= 0.15;
+            issues.push('Air flow suboptimal');
+        }
+        if (values.Fan_Speed < 1900 || values.Fan_Speed > 2350) {
+            score -= 0.15;
+            issues.push('Fan speed suboptimal');
+        }
+        if (values.Heating_Power < 13 || values.Heating_Power > 17) {
+            score -= 0.15;
+            issues.push('Heating power suboptimal');
+        }
+        if (values.Fan_Power < 190 || values.Fan_Power > 260) {
+            score -= 0.15;
+            issues.push('Fan power suboptimal');
+        }
+        
+        let status, confidence;
+        if (score > 0.8) {
+            status = 'HEALTHY';
+            confidence = 0.85 + Math.random() * 0.1;
+        } else if (score > 0.6) {
+            status = 'WARNING';
+            confidence = 0.75 + Math.random() * 0.1;
+        } else {
+            status = 'CRITICAL';
+            confidence = 0.65 + Math.random() * 0.15;
+        }
+        
+        return {
+            predicted_status: status,
+            confidence: confidence,
+            time_to_failure: Math.random() * 50 + 20,
+            health_score: score
+        };
+    }
+    
+    // Update AI health display
+    function updateAIHealthDisplay(prediction) {
+        const healthStatus = document.getElementById('health-status');
+        const healthIndicator = document.getElementById('health-indicator');
+        const confidenceLevel = document.getElementById('confidence-level');
+        const timeToFailure = document.getElementById('time-to-failure');
+        
+        healthStatus.textContent = prediction.predicted_status;
+        confidenceLevel.textContent = (prediction.confidence * 100).toFixed(1) + '%';
+        timeToFailure.textContent = prediction.time_to_failure.toFixed(1) + ' hours';
+        
+        // Update health indicator styling
+        healthIndicator.className = 'health-indicator';
+        if (prediction.predicted_status === 'HEALTHY') {
+            healthIndicator.classList.add('health-healthy');
+        } else if (prediction.predicted_status === 'WARNING') {
+            healthIndicator.classList.add('health-warning');
+        } else {
+            healthIndicator.classList.add('health-critical');
+        }
+    }
+    
+    // Simulation loop
+    async function simulationStep() {
+        if (!isSimulating) return;
+        
+        const sensorValues = getCurrentSensorValues();
+        
+        // Add small random variations to simulate real sensor noise
+        const noisyValues = {
+            Temperature: sensorValues.Temperature + (Math.random() - 0.5) * 0.5,
+            Humidity: sensorValues.Humidity + (Math.random() - 0.5) * 1.0,
+            Air_Flow_Rate: sensorValues.Air_Flow_Rate + (Math.random() - 0.5) * 2.0,
+            Fan_Speed: sensorValues.Fan_Speed + Math.round((Math.random() - 0.5) * 20),
+            Heating_Power: sensorValues.Heating_Power + (Math.random() - 0.5) * 0.2,
+            Fan_Power: sensorValues.Fan_Power + (Math.random() - 0.5) * 5.0
+        };
+        
+        // Update charts
+        updateCharts(noisyValues);
+        
+        // Get AI prediction
+        const prediction = await getAIPrediction(noisyValues);
+        updateAIHealthDisplay(prediction);
+    }
+    
+    // Slider event handlers
+    function setupSliders() {
+        const sliders = [
+            { id: 'temp-slider', display: 'temp-display', decimals: 1 },
+            { id: 'humidity-slider', display: 'humidity-display', decimals: 1 },
+            { id: 'airflow-slider', display: 'airflow-display', decimals: 1 },
+            { id: 'fanspeed-slider', display: 'fanspeed-display', decimals: 0 },
+            { id: 'heating-slider', display: 'heating-display', decimals: 1 },
+            { id: 'fanpower-slider', display: 'fanpower-display', decimals: 1 }
+        ];
+        
+        sliders.forEach(slider => {
+            const element = document.getElementById(slider.id);
+            const display = document.getElementById(slider.display);
+            
+            element.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                display.textContent = value.toFixed(slider.decimals);
+            });
+        });
+    }
+    
+    // Control buttons
+    document.getElementById('start-simulation').addEventListener('click', function() {
+        isSimulating = true;
+        this.disabled = true;
+        document.getElementById('stop-simulation').disabled = false;
+        
+        // Start simulation loop
+        simulationInterval = setInterval(simulationStep, 1000); // Update every second
+        
+        console.log('🚀 AI Simulation started');
+    });
+    
+    document.getElementById('stop-simulation').addEventListener('click', function() {
+        isSimulating = false;
+        this.disabled = true;
+        document.getElementById('start-simulation').disabled = false;
+        
+        if (simulationInterval) {
+            clearInterval(simulationInterval);
+            simulationInterval = null;
+        }
+        
+        console.log('⏹️ AI Simulation stopped');
+    });
+    
+    document.getElementById('reset-defaults').addEventListener('click', function() {
+        // Reset all sliders to default values
+        document.getElementById('temp-slider').value = 28.0;
+        document.getElementById('temp-display').textContent = '28.0';
+        
+        document.getElementById('humidity-slider').value = 65.0;
+        document.getElementById('humidity-display').textContent = '65.0';
+        
+        document.getElementById('airflow-slider').value = 120.0;
+        document.getElementById('airflow-display').textContent = '120.0';
+        
+        document.getElementById('fanspeed-slider').value = 2200;
+        document.getElementById('fanspeed-display').textContent = '2200';
+        
+        document.getElementById('heating-slider').value = 15.0;
+        document.getElementById('heating-display').textContent = '15.0';
+        
+        document.getElementById('fanpower-slider').value = 225.0;
+        document.getElementById('fanpower-display').textContent = '225.0';
+        
+        console.log('🔄 Reset to default values');
+    });
+    
+    // Initialize everything
+    initializeCharts();
+    setupSliders();
+    
+    console.log('✅ AI Machine Monitoring System initialized');
+});
+</script>
+{% endblock %}

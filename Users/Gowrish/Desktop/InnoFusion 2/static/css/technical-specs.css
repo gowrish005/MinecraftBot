@@ -1,0 +1,177 @@
+/* Technical Specifications and Machine Image Styles */
+.specs-card {
+    background-color: var(--dark-color-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.specs-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    padding: 1.2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.specs-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.specs-header h5 {
+    color: white;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+}
+
+.specs-header h5 i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.specs-body {
+    background-color: var(--dark-color-light);
+    padding: 0;
+}
+
+.specs-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.specs-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.specs-item:last-child {
+    border-bottom: none;
+}
+
+.specs-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.specs-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.specs-value {
+    color: var(--text-color);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Machine Image Card */
+.machine-image-card {
+    background-color: var(--dark-color-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.machine-image-header {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #22D3EE 100%);
+    padding: 1.2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.machine-image-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.machine-image-header h5 {
+    color: white;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+}
+
+.machine-image-header h5 i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.machine-image-body {
+    background-color: var(--dark-color-light);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.machine-image-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.machine-detail-image {
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.machine-detail-image:hover {
+    transform: scale(1.02);
+}
+
+.no-image-alert {
+    background-color: rgba(34, 211, 238, 0.1);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    color: #22D3EE;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .specs-item {
+        padding: 0.75rem 1rem;
+    }
+    
+    .specs-header, .machine-image-header {
+        padding: 1rem;
+    }
+    
+    .machine-image-body {
+        padding: 1rem;
+    }
+}

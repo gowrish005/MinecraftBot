@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tea Processing - AI Monitor{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- ScrollReveal - Animate On Scroll Replacement -->
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/predictive-maintenance.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/technical-specs.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chart-enhancement.css') }}">
+      <style>
+        /* Analytics Modal Styling */
+        .modal-content {
+            background-color: var(--dark-color-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-color);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Modal animation */
+        .modal.fade .modal-dialog {
+            transform: scale(0.95) translateY(-30px);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .modal.show .modal-dialog {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-title i.text-accent {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            background: rgba(34, 211, 238, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn-close {
+            color: var(--text-color);
+            opacity: 0.5;
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        /* Process Groups */
+        .process-group-title {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        
+        .process-group-title i {
+            color: var(--accent-color);
+        }
+        
+        /* Machine Analytics Cards */
+        .machine-analytics-card {
+            background-color: var(--dark-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .machine-analytics-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+          .machine-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.03), transparent);
+        }
+        
+        .machine-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-running {
+            background-color: var(--success-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-idle {
+            background-color: var(--warning-color);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
+        
+        .status-maintenance {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+        }
+        
+        .status-fault, .status-error {
+            background-color: var(--fault-color);
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        
+        .status-text-running {
+            color: var (--success-color);
+        }
+        
+        .status-text-idle {
+            color: var(--warning-color);
+        }
+        
+        .status-text-maintenance {
+            color: var(--accent-color);
+        }
+        
+        .status-text-fault, .status-text-error {
+            color: var(--fault-color);
+        }
+        
+        .machine-card-body {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .machine-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-right: 1rem;
+        }
+        
+        .machine-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .machine-metrics {
+            flex: 1;
+        }
+        
+        .metric {
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .metric-value {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .machine-card-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+          .analytics-btn {
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-pulse {
+            animation: buttonPulse 1.5s infinite;
+        }
+        
+        .btn-pulse-hover:hover {
+            animation: buttonPulse 1.5s infinite;
+        }
+          @keyframes buttonPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+                transform: scale(1);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+                transform: scale(1.05);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+                transform: scale(1);
+            }
+        }
+        
+        /* Analytics Stats */
+        .analytics-stats {
+            background-color: var(--dark-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .analytics-stat {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .stat-icon.running {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var (--success-color);
+        }
+        
+        .stat-icon.idle {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: var (--warning-color);
+        }
+        
+        .stat-icon.maintenance {
+            background-color: rgba(34, 211, 238, 0.15);
+            color: var (--accent-color);
+        }
+        
+        .stat-icon.error {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var (--fault-color);
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+        
+        /* Search input */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-container .input-group-text {
+            color: var(--text-muted);
+            border-color: var(--border-color);
+        }
+        
+        .search-container .form-control {
+            background-color: var(--dark-color);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .search-container .form-control:focus {
+            box-shadow: none;
+            border-color: var(--primary-color);
+        }
+          .search-container .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+        
+        /* Quick Actions Dropdown */
+        .dropdown-menu-dark {
+            background-color: var(--dark-color);
+            border-color: var(--border-color);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dropdown-menu-dark .dropdown-item {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .dropdown-menu-dark .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .dropdown-menu-dark .dropdown-divider {
+            border-top-color: var(--border-color);
+        }
+        
+        .btn-outline-light {
+            border-color: var(--border-color);
+            color: var (--text-color);
+        }
+        
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary-light);
+            color: var(--text-color);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head> 
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Leaf Logic AI Logo" class="preloader-logo" loading="lazy">
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Leaf Logic AI Logo" height="40" loading="lazy">
+                </div>
+                <div>
+                    <div class="brand-text">Leaf Logic AI</div>
+                    <div class="brand-tagline">optimizing every leaf, every step.</div>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('static', filename='Leaf_Logic_AI_Prototype_Report.pdf') }}" target="_blank" rel="noopener">Reports</a>
+                    </li>                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#analyticsModal">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-primary" href="#" data-bs-toggle="modal" data-bs-target="#alertsModal">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="alerts-badge">3</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-messages" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 2000; min-width: 300px;">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show mb-2" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <div class="footer-brand">
+                        <div class="brand-icon">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Leaf Logic AI Logo" height="30" loading="lazy">
+                        </div>
+                        <div class="brand-text">Leaf Logic AI</div>
+                    </div>
+                    <p class="footer-tagline">optimizing every leaf, every step. Advanced monitoring and control system for tea processing plants.</p>
+                    <p class="footer-copyright">© 2025 Leaf Logic AI. All rights reserved.</p>
+                </div>
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5 class="footer-heading">Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                        <li><a href="#">Reports</a></li>
+                        <li><a href="#">Analytics</a></li>
+                        <li><a href="#">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 col-6 mb-4 mb-md-0">
+                    <h5 class="footer-heading">Resources</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">Training</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-heading">Contact Us</h5>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i> CIT - North Campus
+                            Kundana, Bengaluru, Karnataka, India – 560036</li>
+                        <li><i class="fas fa-phone"></i> +91 63611 84577</li>
+                        <li><i class="fas fa-envelope"></i> gowrish.cse.nc@cambridge.edu.in</li>
+                    </ul>
+                    <div class="footer-social">
+                        <a href="https://www.linkedin.com/in/gowrish-hb/" class="social-icon" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="mailto:gowrish.cse.nc@cambridge.edu.in" class="social-icon" title="Email"><i class="fas fa-envelope"></i></a>
+                        <a href="https://gowrish.vercel.app/" class="social-icon" target="_blank" rel="noopener"><i class="fas fa-globe"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ScrollReveal - Animate On Scroll Replacement -->
+    <script src="https://unpkg.com/scrollreveal"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize ScrollReveal animations
+            ScrollReveal().reveal('.machine-analytics-card', {
+                distance: '40px',
+                duration: 700,
+                easing: 'ease-in-out',
+                origin: 'bottom',
+                interval: 100,
+                reset: false
+            });
+            
+            // Initialize Bootstrap tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            
+            // Handle preloader
+            setTimeout(function() {
+                document.getElementById('preloader').style.display = 'none';
+            }, 500);
+            
+            // Handle navbar scrolling effect
+            const navbar = document.querySelector('.navbar');
+            window.onscroll = function() {
+                if (window.pageYOffset > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }            };
+            
+            // Analytics Modal Functionality
+            const analyticsModal = document.getElementById('analyticsModal');
+            if (analyticsModal) {
+                // Add animation class to the View Analytics buttons
+                document.querySelectorAll('.analytics-btn').forEach(btn => {
+                    btn.classList.add('btn-pulse-hover');
+                });
+                
+                // Add data-machine-id to each button
+                document.querySelectorAll('.machine-analytics-card').forEach(card => {
+                    const machineId = card.getAttribute('data-machine-id');
+                    const btn = card.querySelector('.analytics-btn');
+                    if (btn && machineId) {
+                        // Add hover effect
+                        card.addEventListener('mouseenter', function() {
+                            btn.classList.add('btn-pulse');
+                        });
+                        
+                        card.addEventListener('mouseleave', function() {
+                            btn.classList.remove('btn-pulse');
+                        });
+                    }
+                });
+                
+                // Fetch real-time data when modal opens                analyticsModal.addEventListener('shown.bs.modal', function() {
+                    // Show loading state
+                    const modalBody = analyticsModal.querySelector('.modal-body');
+                    const processGroups = modalBody.querySelector('.process-groups');
+                    const originalContent = processGroups.innerHTML;
+                    processGroups.innerHTML = `
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3">Loading machine data...</p>
+                        </div>
+                    `;
+                    
+                    // Fetch the latest process data
+                    fetch('/api/process-data')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Restore original content
+                            processGroups.innerHTML = originalContent;
+                            
+                            // Calculate status counts
+                            let runningCount = 0;
+                            let idleCount = 0;
+                            let maintenanceCount = 0;
+                            let faultCount = 0;
+                            
+                            // Update machine cards with fresh data
+                            if (data && data.length > 0) {
+                                data.forEach(process => {
+                                    if (process.machines && process.machines.length > 0) {
+                                        process.machines.forEach(machine => {
+                                            // Count machine status
+                                            switch (machine.status) {
+                                                case 'running':
+                                                    runningCount++;
+                                                    break;
+                                                case 'idle':
+                                                    idleCount++;
+                                                    break;
+                                                case 'maintenance':
+                                                    maintenanceCount++;
+                                                    break;
+                                                case 'fault':
+                                                case 'error':
+                                                    faultCount++;
+                                                    break;
+                                            }
+                                            
+                                            // Find machine card
+                                            const card = document.querySelector(`.machine-analytics-card[data-machine-id="${machine.id}"]`);
+                                            if (card) {
+                                                // Update status indicator
+                                                const statusIndicator = card.querySelector('.status-indicator');
+                                                if (statusIndicator) {
+                                                    statusIndicator.className = 'status-indicator';
+                                                    statusIndicator.classList.add(`status-${machine.status}`);
+                                                }
+                                                
+                                                // Update status text
+                                                const statusValue = card.querySelector('.metric-value');
+                                                if (statusValue) {
+                                                    statusValue.className = 'metric-value';
+                                                    statusValue.classList.add(`status-text-${machine.status}`);
+                                                    statusValue.textContent = machine.status.charAt(0).toUpperCase() + machine.status.slice(1);
+                                                }
+                                                
+                                                // Update efficiency if available
+                                                if (machine.efficiency) {
+                                                    const efficiencyValue = card.querySelectorAll('.metric-value')[1];
+                                                    if (efficiencyValue) {
+                                                        efficiencyValue.textContent = machine.efficiency;
+                                                    }
+                                                }
+                                                
+                                                // Add a data-search attribute with machine name for search functionality
+                                                card.setAttribute('data-search', machine.name.toLowerCase());
+                                            }
+                                        });
+                                    }
+                                });
+                                
+                                // Update status counts in the UI
+                                document.getElementById('analytics-running-count').textContent = runningCount;
+                                document.getElementById('analytics-idle-count').textContent = idleCount;
+                                document.getElementById('analytics-maintenance-count').textContent = maintenanceCount;
+                                document.getElementById('analytics-error-count').textContent = faultCount;
+                                
+                                // Initialize search functionality
+                                initializeMachineSearch();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching process data:', error);
+                            processGroups.innerHTML = originalContent;
+                        });
+                };
+                
+                // Machine search functionality
+                function initializeMachineSearch() {
+                    const searchInput = document.getElementById('machine-search');
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function() {
+                            const searchTerm = this.value.toLowerCase().trim();
+                            const machineCards = document.querySelectorAll('.machine-analytics-card');
+                            
+                            machineCards.forEach(card => {
+                                const machineNameSearch = card.getAttribute('data-search') || '';
+                                const machineNameDisplay = card.querySelector('.machine-name').textContent.toLowerCase();
+                                
+                                // If search term is empty or the machine name contains the search term, show the card
+                                if (searchTerm === '' || machineNameDisplay.includes(searchTerm) || machineNameSearch.includes(searchTerm)) {
+                                    card.closest('.col-md-6').style.display = '';
+                                } else {
+                                    card.closest('.col-md-6').style.display = 'none';
+                                }
+                            });
+                            
+                            // Show/hide process groups based on visible machines
+                            document.querySelectorAll('.process-group').forEach(group => {
+                                const visibleMachines = group.querySelectorAll('.col-md-6[style=""]').length;
+                                const anyVisibleMachines = group.querySelectorAll('.col-md-6:not([style="display: none;"])').length;
+                                group.style.display = anyVisibleMachines > 0 ? '' : 'none';
+                            });                        });
+                    }
+                }
+                
+                // Handle Quick Actions
+                document.querySelectorAll('.quick-action').forEach(action => {
+                    action.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const machineId = this.getAttribute('data-machine-id');
+                        const actionType = this.getAttribute('data-action');
+                        
+                        // Show confirmation for emergency stop
+                        if (actionType === 'emergency-stop') {
+                            if (!confirm('Are you sure you want to emergency stop this machine?')) {
+                                return;
+                            }
+                        }
+                        
+                        // Show loading state
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div> Processing...';
+                        
+                        // Send action to the server
+                        fetch(`/api/machine/${machineId}/control`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ action: actionType })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Restore original text
+                            this.innerHTML = originalText;
+                            
+                            if (data.success) {
+                                // Show success toast
+                                showToast(`Machine ${actionType} command successful`, 'success');
+                                
+                                // Update machine status in UI
+                                updateMachineStatus(machineId, actionType);
+                            } else {
+                                // Show error toast
+                                showToast(`Failed to ${actionType} machine: ${data.message}`, 'danger');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error sending control command:', error);
+                            this.innerHTML = originalText;
+                            showToast(`Failed to ${actionType} machine: Network error`, 'danger');
+                        });
+                    });
+                });
+                
+                // Function to update machine status in the UI
+                function updateMachineStatus(machineId, action) {
+                    const card = document.querySelector(`.machine-analytics-card[data-machine-id="${machineId}"]`);
+                    if (!card) return;
+                    
+                    // Map action to status
+                    let newStatus = 'running';
+                    switch (action) {
+                        case 'start':
+                            newStatus = 'running';
+                            break;
+                        case 'pause':
+                            newStatus = 'idle';
+                            break;
+                        case 'maintenance':
+                            newStatus = 'maintenance';
+                            break;
+                        case 'emergency-stop':
+                            newStatus = 'fault';
+                            break;
+                    }
+                    
+                    // Update status indicator
+                    const statusIndicator = card.querySelector('.status-indicator');
+                    if (statusIndicator) {
+                        statusIndicator.className = 'status-indicator';
+                        statusIndicator.classList.add(`status-${newStatus}`);
+                    }
+                    
+                    // Update status text
+                    const statusValue = card.querySelector('.metric-value');
+                    if (statusValue) {
+                        statusValue.className = 'metric-value';
+                        statusValue.classList.add(`status-text-${newStatus}`);
+                        statusValue.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    }
+                    
+                    // Update machine counts
+                    const runningCount = document.getElementById('analytics-running-count');
+                    const idleCount = document.getElementById('analytics-idle-count');
+                    const maintenanceCount = document.getElementById('analytics-maintenance-count');
+                    const errorCount = document.getElementById('analytics-error-count');
+                    
+                    if (runningCount && idleCount && maintenanceCount && errorCount) {
+                        // First, get all current counts
+                        let running = parseInt(runningCount.textContent) || 0;
+                        let idle = parseInt(idleCount.textContent) || 0;
+                        let maintenance = parseInt(maintenanceCount.textContent) || 0;
+                        let error = parseInt(errorCount.textContent) || 0;
+                        
+                        // Determine old status
+                        const oldStatusEl = card.querySelector('.status-text-running, .status-text-idle, .status-text-maintenance, .status-text-fault, .status-text-error');
+                        let oldStatus = '';
+                        if (oldStatusEl) {
+                            if (oldStatusEl.classList.contains('status-text-running')) oldStatus = 'running';
+                            else if (oldStatusEl.classList.contains('status-text-idle')) oldStatus = 'idle';
+                            else if (oldStatusEl.classList.contains('status-text-maintenance')) oldStatus = 'maintenance';
+                            else if (oldStatusEl.classList.contains('status-text-fault') || oldStatusEl.classList.contains('status-text-error')) oldStatus = 'fault';
+                        }
+                        
+                        // Decrement old status count
+                        if (oldStatus === 'running') running--;
+                        else if (oldStatus === 'idle') idle--;
+                        else if (oldStatus === 'maintenance') maintenance--;
+                        else if (oldStatus === 'fault') error--;
+                        
+                        // Increment new status count
+                        if (newStatus === 'running') running++;
+                        else if (newStatus === 'idle') idle++;
+                        else if (newStatus === 'maintenance') maintenance++;
+                        else if (newStatus === 'fault') error++;
+                        
+                        // Update the UI
+                        runningCount.textContent = running;
+                        idleCount.textContent = idle;
+                        maintenanceCount.textContent = maintenance;
+                        errorCount.textContent = error;
+                    }
+                }
+                
+                // Toast notification function
+                function showToast(message, type = 'info') {
+                    // Colors based on type
+                    const bgColors = {
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        info: '#3B82F6'
+                    };
+                    
+                    // Create toast container if it doesn't exist
+                    let toastContainer = document.querySelector('.toast-container');
+                    if (!toastContainer) {
+                        toastContainer = document.createElement('div');
+                        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                        toastContainer.style.zIndex = '9999';
+                        document.body.appendChild(toastContainer);
+                    }
+                    
+                    // Create toast
+                    const toastId = 'toast-' + Date.now();
+                    const toast = document.createElement('div');
+                    toast.className = 'toast';
+                    toast.id = toastId;
+                    toast.innerHTML = `
+                        <div class="toast-header" style="background-color: ${bgColors[type] || bgColors.info}; color: white;">
+                            <strong class="me-auto">Tea Processing Monitor</strong>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body" style="background-color: var(--dark-color-light); color: var(--text-color);">
+                            ${message}
+                        </div>
+                    `;
+                    
+                    // Add to container
+                    toastContainer.appendChild(toast);
+                    
+                    // Initialize and show toast
+                    const toastInstance = new bootstrap.Toast(toast, {
+                        delay: 3000
+                    });
+                    toastInstance.show();
+                    
+                    // Remove toast when hidden
+                    toast.addEventListener('hidden.bs.toast', function() {
+                        this.remove();
+                    });
+                }
+            }
+        );
+        
+        // Auto-dismiss flash messages after 3 seconds
+        setTimeout(function() {
+          const flash = document.getElementById('flash-messages');
+          if (flash) {
+            flash.style.transition = 'opacity 0.5s';
+            flash.style.opacity = 0;
+            setTimeout(() => flash.remove(), 500);
+          }
+        }, 3000);
+    </script>
+    
+    <!-- Alerts Modal -->
+    <div class="modal fade" id="alertsModal" tabindex="-1" aria-labelledby="alertsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertsModalLabel">
+                        <i class="fas fa-bell text-danger me-2"></i> Machine Alerts
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="alerts-list">
+                        <!-- Alerts will be injected here by JS -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    // Fake data for demonstration
+    const fakeAlerts = [
+        {
+            machine: 'CTC Machine 2',
+            status: 'fault',
+            reason: 'Overheating detected in main motor. Immediate inspection required.'
+        },
+        {
+            machine: 'Drum Dryer 1',
+            status: 'maintenance',
+            reason: 'Scheduled maintenance: Lubrication of moving parts.'
+        },
+        {
+            machine: 'Vibro Sifter 3',
+            status: 'fault',
+            reason: 'Vibration sensor anomaly. Possible misalignment.'
+        }
+    ];
+    
+    function renderAlerts() {
+        const alertsList = document.getElementById('alerts-list');
+        if (!alertsList) return;
+        if (fakeAlerts.length === 0) {
+            alertsList.innerHTML = '<div class="text-center text-muted">No current alerts.</div>';
+            document.getElementById('alerts-badge').textContent = '0';
+            return;
+        }
+        let html = '<ul class="list-group">';
+        fakeAlerts.forEach(alert => {
+            html += `<li class="list-group-item d-flex align-items-start">
+                <span class="me-3">
+                    <i class="fas fa-exclamation-triangle text-${alert.status === 'fault' ? 'danger' : 'warning'}"></i>
+                </span>
+                <div>
+                    <div><strong>${alert.machine}</strong> <span class="badge bg-${alert.status === 'fault' ? 'danger' : 'warning'} text-uppercase ms-2">${alert.status}</span></div>
+                    <div class="small text-muted">${alert.reason}</div>
+                </div>
+            </li>`;
+        });
+        html += '</ul>';
+        alertsList.innerHTML = html;
+        document.getElementById('alerts-badge').textContent = fakeAlerts.length;
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        renderAlerts();
+        // Optionally, re-render alerts when modal is shown
+        const alertsModal = document.getElementById('alertsModal');
+        if (alertsModal) {
+            alertsModal.addEventListener('show.bs.modal', renderAlerts);
+        }
+    });
+    </script>
+    
+    <!-- Analytics Modal -->
+    <div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="analyticsModalLabel">
+                        <i class="fas fa-chart-bar text-accent me-2"></i> Machine Analytics
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>                <div class="modal-body">
+                    <div class="analytics-header mb-4">
+                        <p class="text-muted mb-3">Select a machine to view detailed analytics and performance metrics.</p>
+                        <div class="analytics-stats">
+                            <div class="row">
+                                <div class="col-md-3 col-6">
+                                    <div class="analytics-stat">
+                                        <div class="stat-value"><span class="stat-icon running"><i class="fas fa-play-circle"></i></span> <span id="analytics-running-count">--</span></div>
+                                        <div class="stat-label">Running</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="analytics-stat">
+                                        <div class="stat-value"><span class="stat-icon idle"><i class="fas fa-pause-circle"></i></span> <span id="analytics-idle-count">--</span></div>
+                                        <div class="stat-label">Idle</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="analytics-stat">
+                                        <div class="stat-value"><span class="stat-icon maintenance"><i class="fas fa-tools"></i></span> <span id="analytics-maintenance-count">--</span></div>
+                                        <div class="stat-label">Maintenance</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="analytics-stat">
+                                        <div class="stat-value"><span class="stat-icon error"><i class="fas fa-exclamation-triangle"></i></span> <span id="analytics-error-count">--</span></div>
+                                        <div class="stat-label">Faults</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <!-- Process Groups -->
+                    <div class="process-groups">
+                        {% for process in processes %}
+                        <div class="process-group mb-4">
+                            <h6 class="process-group-title">
+                                <i class="fas fa-layer-group me-2"></i>{{ process.name }}
+                            </h6>
+                            <div class="row">
+                                {% for machine in process.machines %}                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="machine-analytics-card" data-machine-id="{{ machine.id }}">
+                                        <div class="machine-card-header">
+                                            <div class="machine-name">{{ machine.name }}</div>
+                                            <span class="status-indicator status-{{ machine.status }}"></span>
+                                        </div>
+                                        <div class="machine-card-footer">
+                                            <div class="row g-2">
+                                                <div class="col">
+                                                    <a href="{{ url_for('machine_detail', process_name=process.name, machine_id=machine.id) }}" class="btn btn-primary btn-sm analytics-btn">
+                                                        <i class="fas fa-chart-line me-1"></i> View Analytics
+                                                    </a>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fas fa-cog"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                                            <li><a class="dropdown-item quick-action" href="#" data-action="start" data-machine-id="{{ machine.id }}"><i class="fas fa-play-circle me-2 text-success"></i>Start</a></li>
+                                                            <li><a class="dropdown-item quick-action" href="#" data-action="pause" data-machine-id="{{ machine.id }}"><i class="fas fa-pause-circle me-2 text-warning"></i>Pause</a></li>
+                                                            <li><a class="dropdown-item quick-action" href="#" data-action="maintenance" data-machine-id="{{ machine.id }}"><i class="fas fa-tools me-2 text-info"></i>Maintenance</a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li><a class="dropdown-item quick-action" href="#" data-action="emergency-stop" data-machine-id="{{ machine.id }}"><i class="fas fa-stop-circle me-2 text-danger"></i>Emergency Stop</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

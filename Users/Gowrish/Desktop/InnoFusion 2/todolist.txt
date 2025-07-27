@@ -1,0 +1,48 @@
+# Tea Processing AI Monitor Project Todolist
+
+## Project Setup
+- [x] Define project requirements
+- [x] Create basic file structure
+
+## Backend Development
+- [x] Set up Flask application in app.py
+- [x] Create routes.py for URL handling
+- [x] Implement views.py for rendering
+- [x] Create controllers.py for business logic
+- [x] Set up models.py for database models
+- [x] Configure MongoDB integration with pymongo
+- [x] Create test.py for testing data insertion
+
+## Frontend Development
+- [x] Design UI layout with responsive design
+- [x] Create section cards for each tea processing step:
+  - [x] Withering (Wilting)
+  - [x] Rolling and Shaping
+  - [x] Fermentation (Oxidation)
+  - [x] Drying (Firing)
+  - [x] Sorting and Grading
+  - [x] Packing and Packaging
+- [x] Implement flex grid layout for machine monitoring cards
+- [x] Design machine status indicators
+- [x] Create data visualization components
+
+## Integration
+- [x] Connect frontend to Flask backend
+  - [x] Add API endpoint for machine control
+  - [x] Add API endpoint for machine readings
+  - [x] Implement real-time data refresh
+- [ ] Test data flow from database to UI
+
+## Testing
+- [ ] Unit tests for backend functionality
+  - [ ] Test routes and API endpoints
+  - [ ] Test controller functions
+  - [ ] Test database operations
+- [ ] Integration tests
+- [ ] UI/UX testing
+- [ ] Performance testing
+
+## Deployment
+- [ ] Prepare for production environment
+- [ ] Deploy application
+- [ ] Monitor system performance

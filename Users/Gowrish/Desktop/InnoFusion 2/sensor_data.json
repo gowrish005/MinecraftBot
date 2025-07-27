@@ -1,0 +1,277 @@
+{
+  "current": {
+    "Temperature": 28.35,
+    "Humidity": 64.55,
+    "Air_Flow_Rate": 121.0,
+    "Fan_Speed": 2213.17,
+    "Heating_Power": 15.45,
+    "Fan_Power": 232.63
+  },
+  "timestamp": "2025-07-27T06:44:07.966234",
+  "recent_history": [
+    {
+      "timestamp": "2025-07-27T06:43:21.736121",
+      "data": {
+        "Temperature": 28.2,
+        "Humidity": 64.66,
+        "Air_Flow_Rate": 119.33,
+        "Fan_Speed": 2231.72,
+        "Heating_Power": 15.32,
+        "Fan_Power": 228.19
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:23.748236",
+      "data": {
+        "Temperature": 28.32,
+        "Humidity": 64.59,
+        "Air_Flow_Rate": 120.25,
+        "Fan_Speed": 2223.96,
+        "Heating_Power": 15.4,
+        "Fan_Power": 227.84
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:25.756549",
+      "data": {
+        "Temperature": 28.38,
+        "Humidity": 64.57,
+        "Air_Flow_Rate": 121.06,
+        "Fan_Speed": 2216.84,
+        "Heating_Power": 15.47,
+        "Fan_Power": 226.75
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:27.763274",
+      "data": {
+        "Temperature": 28.19,
+        "Humidity": 64.42,
+        "Air_Flow_Rate": 120.78,
+        "Fan_Speed": 2209.08,
+        "Heating_Power": 15.53,
+        "Fan_Power": 227.7
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:29.768511",
+      "data": {
+        "Temperature": 28.01,
+        "Humidity": 64.4,
+        "Air_Flow_Rate": 120.62,
+        "Fan_Speed": 2219.3,
+        "Heating_Power": 15.51,
+        "Fan_Power": 226.59
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:31.776138",
+      "data": {
+        "Temperature": 28.14,
+        "Humidity": 64.19,
+        "Air_Flow_Rate": 119.86,
+        "Fan_Speed": 2210.25,
+        "Heating_Power": 15.52,
+        "Fan_Power": 225.53
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:33.784419",
+      "data": {
+        "Temperature": 27.91,
+        "Humidity": 64.17,
+        "Air_Flow_Rate": 120.25,
+        "Fan_Speed": 2209.43,
+        "Heating_Power": 15.38,
+        "Fan_Power": 226.55
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:35.791975",
+      "data": {
+        "Temperature": 28.14,
+        "Humidity": 64.45,
+        "Air_Flow_Rate": 120.89,
+        "Fan_Speed": 2208.63,
+        "Heating_Power": 15.39,
+        "Fan_Power": 227.11
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:37.799164",
+      "data": {
+        "Temperature": 27.95,
+        "Humidity": 65.07,
+        "Air_Flow_Rate": 121.55,
+        "Fan_Speed": 2211.02,
+        "Heating_Power": 15.44,
+        "Fan_Power": 226.78
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:39.804371",
+      "data": {
+        "Temperature": 27.75,
+        "Humidity": 64.71,
+        "Air_Flow_Rate": 122.43,
+        "Fan_Speed": 2222.54,
+        "Heating_Power": 15.37,
+        "Fan_Power": 226.97
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:41.810777",
+      "data": {
+        "Temperature": 27.72,
+        "Humidity": 64.79,
+        "Air_Flow_Rate": 121.98,
+        "Fan_Speed": 2218.76,
+        "Heating_Power": 15.4,
+        "Fan_Power": 228.08
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:43.824544",
+      "data": {
+        "Temperature": 27.94,
+        "Humidity": 65.2,
+        "Air_Flow_Rate": 120.97,
+        "Fan_Speed": 2206.6,
+        "Heating_Power": 15.31,
+        "Fan_Power": 229.14
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:45.831635",
+      "data": {
+        "Temperature": 27.99,
+        "Humidity": 65.02,
+        "Air_Flow_Rate": 121.09,
+        "Fan_Speed": 2217.03,
+        "Heating_Power": 15.23,
+        "Fan_Power": 229.79
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:47.839178",
+      "data": {
+        "Temperature": 28.11,
+        "Humidity": 64.97,
+        "Air_Flow_Rate": 122.21,
+        "Fan_Speed": 2212.6,
+        "Heating_Power": 15.33,
+        "Fan_Power": 230.99
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:49.846577",
+      "data": {
+        "Temperature": 28.14,
+        "Humidity": 64.89,
+        "Air_Flow_Rate": 122.79,
+        "Fan_Speed": 2215.16,
+        "Heating_Power": 15.31,
+        "Fan_Power": 232.15
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:51.854764",
+      "data": {
+        "Temperature": 28.23,
+        "Humidity": 65.33,
+        "Air_Flow_Rate": 123.35,
+        "Fan_Speed": 2222.96,
+        "Heating_Power": 15.19,
+        "Fan_Power": 232.14
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:53.862229",
+      "data": {
+        "Temperature": 28.43,
+        "Humidity": 65.0,
+        "Air_Flow_Rate": 122.82,
+        "Fan_Speed": 2210.87,
+        "Heating_Power": 15.29,
+        "Fan_Power": 232.73
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:55.869447",
+      "data": {
+        "Temperature": 28.44,
+        "Humidity": 65.51,
+        "Air_Flow_Rate": 121.59,
+        "Fan_Speed": 2218.79,
+        "Heating_Power": 15.38,
+        "Fan_Power": 232.67
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:57.895137",
+      "data": {
+        "Temperature": 28.31,
+        "Humidity": 65.03,
+        "Air_Flow_Rate": 121.68,
+        "Fan_Speed": 2207.24,
+        "Heating_Power": 15.25,
+        "Fan_Power": 231.25
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:43:59.922561",
+      "data": {
+        "Temperature": 28.17,
+        "Humidity": 65.51,
+        "Air_Flow_Rate": 120.42,
+        "Fan_Speed": 2217.15,
+        "Heating_Power": 15.29,
+        "Fan_Power": 232.27
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:44:01.942480",
+      "data": {
+        "Temperature": 28.39,
+        "Humidity": 65.19,
+        "Air_Flow_Rate": 119.79,
+        "Fan_Speed": 2223.21,
+        "Heating_Power": 15.28,
+        "Fan_Power": 232.23
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:44:03.951241",
+      "data": {
+        "Temperature": 28.17,
+        "Humidity": 64.89,
+        "Air_Flow_Rate": 119.1,
+        "Fan_Speed": 2210.22,
+        "Heating_Power": 15.38,
+        "Fan_Power": 232.47
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:44:05.959717",
+      "data": {
+        "Temperature": 28.33,
+        "Humidity": 64.39,
+        "Air_Flow_Rate": 120.25,
+        "Fan_Speed": 2221.29,
+        "Heating_Power": 15.45,
+        "Fan_Power": 232.85
+      }
+    },
+    {
+      "timestamp": "2025-07-27T06:44:07.964698",
+      "data": {
+        "Temperature": 28.35,
+        "Humidity": 64.55,
+        "Air_Flow_Rate": 121.0,
+        "Fan_Speed": 2213.17,
+        "Heating_Power": 15.45,
+        "Fan_Power": 232.63
+      }
+    }
+  ]
+}
