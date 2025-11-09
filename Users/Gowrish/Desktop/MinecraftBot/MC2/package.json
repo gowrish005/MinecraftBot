@@ -1,0 +1,18 @@
+{
+  "name": "afk-bot",
+  "version": "1.2",
+  "description": "Afk bot for minecraft servers.",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "author": "urFate",
+  "license": "MIT",
+  "dependencies": {
+    "afk-bot": "file:",
+    "express": "^4.21.2",
+    "minecraft-data": "^3.83.1",
+    "mineflayer": "^4.2.0",
+    "mineflayer-pathfinder": "^2.4.5"
+  }
+}

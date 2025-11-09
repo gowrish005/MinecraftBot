@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Log files
+*.log
+**/bot_output.log
+**/*_output.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Configuration files with sensitive data
+launcher_accounts.json
+global_config.json
+settings.json
+
+# Installation status files
+**/install_status.txt
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build files
+dist/
+build/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
