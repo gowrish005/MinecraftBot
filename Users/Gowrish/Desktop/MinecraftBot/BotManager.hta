@@ -532,6 +532,9 @@ body {
                         <button class="btn btn-primary btn-sm" onclick="configureStartup()">
                             <span>🚀 Configure Startup</span>
                         </button>
+                        <button class="btn btn-success btn-sm" onclick="installNodeJS()">
+                            <span>📦 Install Node.js</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1173,7 +1176,7 @@ function toggleAlerts() {
 function configureStartup() {
     var startupFolder = shell.SpecialFolders("Startup");
     var shortcutPath = fso.BuildPath(startupFolder, "MinecraftBotManager.lnk");
-    var htaPath = fso.BuildPath(shell.CurrentDirectory, "BotManager_v2.hta");
+    var htaPath = fso.BuildPath(shell.CurrentDirectory, "BotManager.hta");
     
     if (fso.FileExists(shortcutPath)) {
         var remove = confirm("Startup is currently ENABLED.\n\nDo you want to REMOVE from startup?\n\nClick OK to remove, Cancel to keep it.");
@@ -1209,6 +1212,69 @@ function configureStartup() {
             alert("❌ Error adding to startup: " + e.message);
             logMessage("Error configuring startup: " + e.message, "error");
         }
+    }
+}
+
+function installNodeJS() {
+    var confirmInstall = confirm("This will download and install Node.js LTS (Long Term Support) version.\n\n✅ This is recommended if you don't have Node.js installed.\n\nProceed with installation?");
+    
+    if (!confirmInstall) {
+        logMessage("Node.js installation cancelled by user", "warning");
+        return;
+    }
+    
+    logMessage("Starting Node.js installation process...", "info");
+    
+    try {
+        // Check if Node.js is already installed
+        var nodeCheckCmd = 'node --version';
+        var nodeCheck = shell.Exec(nodeCheckCmd);
+        
+        // Wait a bit for the command to execute
+        var timeout = 0;
+        while (nodeCheck.Status == 0 && timeout < 30) {
+            WScript.Sleep(100);
+            timeout++;
+        }
+        
+        if (nodeCheck.Status == 1) {
+            var nodeVersion = nodeCheck.StdOut.ReadAll();
+            if (nodeVersion) {
+                var alreadyInstalled = confirm("Node.js is already installed!\n\nCurrent version: " + nodeVersion.trim() + "\n\nDo you want to download the latest LTS version anyway?");
+                if (!alreadyInstalled) {
+                    logMessage("Node.js installation cancelled - already installed: " + nodeVersion.trim(), "info");
+                    return;
+                }
+            }
+        }
+    } catch (e) {
+        logMessage("Could not check Node.js version (might not be installed): " + e.message, "warning");
+    }
+    
+    // Download Node.js LTS installer
+    logMessage("Opening Node.js download page...", "info");
+    
+    try {
+        // Open the Node.js download page
+        shell.Run("https://nodejs.org/en/download/", 1, false);
+        
+        alert("📦 Node.js Download Page Opened!\n\nPlease:\n1. Download the Windows Installer (.msi)\n2. Choose the LTS version (recommended)\n3. Run the installer\n4. Follow the installation wizard\n5. Restart this bot manager after installation\n\nRecommended: Use default settings during installation.");
+        logMessage("Node.js download page opened in browser", "success");
+        
+        // Optionally, provide direct download link
+        var directDownload = confirm("Would you like to download Node.js LTS installer directly?\n\n(This will start downloading the 64-bit Windows installer)");
+        
+        if (directDownload) {
+            // Direct download link for Node.js LTS 64-bit Windows installer
+            var downloadUrl = "https://nodejs.org/dist/v20.11.0/node-v20.11.0-x64.msi";
+            logMessage("Starting direct download of Node.js installer...", "info");
+            shell.Run(downloadUrl, 1, false);
+            alert("✅ Download started!\n\nThe Node.js installer will be downloaded to your Downloads folder.\n\nOnce downloaded:\n1. Run the .msi file\n2. Follow the installation wizard\n3. Restart this bot manager");
+            logMessage("Node.js installer download initiated", "success");
+        }
+    } catch (e) {
+        alert("❌ Error opening download page: " + e.message + "\n\nPlease manually visit: https://nodejs.org/");
+        logMessage("Error opening Node.js download: " + e.message, "error");
     }
 }
 
